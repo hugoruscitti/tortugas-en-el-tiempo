@@ -1,24 +1,14 @@
-# tortugas-en-el-tiempo
+# Tortugas en el tiempo
 
-## Project setup
+Un entorno de programación experimental.
+
+## Como iniciar el proyecto
+
+Para iniciar el servidor en modo desarrollo
+hay que ejecutar estos comandos:
+
 ```
 yarn install
-```
-
-### Compiles and hot-reloads for development
-```
 yarn serve
 ```
 
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
