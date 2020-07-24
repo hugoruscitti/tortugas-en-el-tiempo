@@ -1,14 +1,23 @@
 <template lang="html">
-  <div class="">
-    <canvas class="ba b--gray" width="300" height="300"></canvas>
+  <div class="flex">
+    <canvas class="ba b--gray" width="300" height="300" ref="canvas"></canvas>
 
-    <div class="pv3 verdana">
-      <button @click="dibujar">Dibujar</button>
-    </div>
+    <div class="ml2 bg-light-gray pa3 flex-grow-1">
+      <div class="verdana">
+        <button @click="dibujar">Dibujar</button>
+      </div>
 
-    <div class="verdana">
-      X: <input min="0" max="300" type="range" v-model="x">
-      Y: <input min="0" max="300" type="range" v-model="y">
+      <div class="verdana pt3">
+        X: <input min="0" max="300" type="range" v-model="x">
+        Y: <input min="0" max="300" type="range" v-model="y">
+      </div>
+
+      <div class="verdana pt3">
+        Contador {{contador}}
+
+
+        <button @click="incrementar">++</button>
+      </div>
     </div>
 
   </div>
@@ -30,7 +39,7 @@ export default {
   },
 
   async mounted() {
-    this.canvas = this.$el.querySelector("canvas");
+    this.canvas = this.$refs.canvas;
     await this.crearTortuga();
     this.dibujar();
   },
@@ -39,6 +48,10 @@ export default {
   computed: {
     contexto() {
       return this.canvas.getContext("2d");
+    },
+
+    contador() {
+      return this.$store.state.contador;
     }
   },
 
@@ -62,6 +75,10 @@ export default {
         this.tortuga.onload = resolve
       })
     },
+
+    incrementar() {
+      this.$store.commit("incrementar");
+    }
   },
 
 }
