@@ -21,7 +21,6 @@ yarn serve
 Hay dos tipos de test en el proyecto, así que para ejecutarlos
 hay dos comandos diferentes:
 
-
 ```
 yarn test:unit
 yarn test:e2e

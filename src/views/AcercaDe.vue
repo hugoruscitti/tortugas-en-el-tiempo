@@ -10,8 +10,8 @@
   </p>
 
   <p>
-    Para más información podes visitar
-    <a target="_blank" href="https://github.com/hugoruscitti">github</a> o mi
+    Para más información podes visitar el
+    <a target="_blank" href="https://github.com/hugoruscitti/tortugas-en-el-tiempo">repositorio de este proyecto</a>
     <a target="_blank" href="https://examplelab.com.ar">blog</a>.
   </p>
 
