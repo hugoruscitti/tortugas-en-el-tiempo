@@ -12,7 +12,7 @@
   <p>
     Para más información podes visitar
     <a target="_blank" href="https://github.com/hugoruscitti">github</a> o mi
-    <a target="_blank" href="https://examplelab.com.ar">blog</a>
+    <a target="_blank" href="https://examplelab.com.ar">blog</a>.
   </p>
 
 

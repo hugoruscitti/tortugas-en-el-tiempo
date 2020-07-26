@@ -18,6 +18,7 @@
         </div>
 
       </div>
+
     </div>
 
   </div>
@@ -31,13 +32,25 @@ export default {
 
   data() {
     return {
-      modo: "edición", // "ejecución", "edición" y "pausa"
+      modo: "ejecución", // "ejecución", "edición" y "pausa"
     }
   },
 
   async mounted() {
     this.juego = new Juego();
     await this.juego.iniciar(this.$refs.canvas);
+
+    let i = 0;
+    while (i < 10) {
+      this.juego.rotar(30);
+      this.juego.avanzar(10);
+      i++;
+    }
+
+    //this.juego.rotar(180);
+    //this.juego.avanzar(1);
+
+    this.juego.ejecutar();
   },
 
   computed: {},

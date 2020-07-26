@@ -6,10 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     contador: 0,
-    codigo: `
-    avanzar(10)
-    girarDerecha(10)
-    `
+    codigo: ['avanzar(10)', 'girarDerecha(10)'].join("\n"),
   },
   mutations: {
     incrementar(estado) {
