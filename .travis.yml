@@ -1,8 +1,16 @@
 language: node_js
 node_js:
  - "node"
-
-cache: npm
+addons:
+  apt:
+    packages:
+      # Dependencia de cypress
+      - libgconf-2-4
+cache:
+  npm: true
+  directories:
+    # Para cypress
+    - ~/.cache
 
 script:
   - npm run test:unit
