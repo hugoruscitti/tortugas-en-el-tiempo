@@ -2,24 +2,31 @@ import imagenes from "@/recursos/imagen_de_tortuga.js";
 import Avanzar from "@/comportamientos/avanzar.js";
 import Rotar from "@/comportamientos/rotar.js";
 
-export default class {
+class Juego {
 
-  async iniciar(canvas) {
+  constructor() {
+
+  }
+
+  async iniciar(canvas, vuexStore) {
     this.canvas = canvas;
+    this.store = vuexStore;
+
     await this.crearTortuga();
     this.reiniciar();
 
-    this.comportamientos = [];
-    this.comportamientoActual = null;
+    window.juego = this;
   }
 
   reiniciar() {
     this.entidad = {
-      x: 100,
-      y: 100,
+      x: 150,
+      y: 150,
       rotacion: 0,
-      accion: ""
     };
+
+    this.comportamientos = [];
+    this.comportamientoActual = null;
 
     this.dibujar();
   }
@@ -39,9 +46,6 @@ export default class {
   dibujar() {
     this.limpiar();
 
-    this.contexto.font = '14px verdana';
-    this.contexto.fillText(this.entidad.accion, 10, 20);
-
     this.contexto.save();
     this.contexto.translate(this.entidad.x, this.entidad.y);
     this.contexto.rotate((Math.PI / 180) * this.entidad.rotacion);
@@ -59,10 +63,13 @@ export default class {
     this.setIntervalID = setInterval(() => {
       this.actualizar();
       this.dibujar();
-    }, 1000 / 30)
+    }, 1000 / 60)
+
+    this.store.commit("EJECUTAR");
   }
 
   detener() {
+    this.store.commit("DETENER");
     clearInterval(this.setIntervalID);
     this.reiniciar();
   }
@@ -83,10 +90,10 @@ export default class {
     if (this.comportamientos.length > 0) {
       this.comportamientoActual = this.comportamientos.shift();
       this.comportamientoActual.iniciar(this.entidad);
-      this.entidad.accion = this.comportamientoActual.accion;
+      this.store.commit("DEFINIR_ACCION_DE_LA_TORTUGA", this.comportamientoActual.accion);
     } else {
       this.comportamientoActual = null;
-      this.entidad.accion = "Reposando";
+      this.store.commit("DEFINIR_ACCION_DE_LA_TORTUGA", "Reposando");
     }
   }
 
@@ -101,3 +108,5 @@ export default class {
   }
 
 }
+
+export default new Juego();

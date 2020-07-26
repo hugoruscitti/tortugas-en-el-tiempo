@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="flex">
   <lienzo></lienzo>
   <codigo></codigo>
 </div>

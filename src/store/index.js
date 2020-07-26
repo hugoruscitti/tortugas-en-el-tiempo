@@ -1,21 +1,38 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
+
   state: {
     contador: 0,
     codigo: ['avanzar(10)', 'girarDerecha(10)'].join("\n"),
+    modo: "edición", // "ejecución", "edición" y "pausa"
+    accionDeLaTortuga: "esperando",
   },
+
   mutations: {
-    incrementar(estado) {
-      estado.contador += 1;
-    },
-    cambiarCódigo(estado, código) {
+
+    CAMBIAR_CÓDIGO(estado, código) {
       estado.codigo = código;
-    }
+    },
+
+    DEFINIR_ACCION_DE_LA_TORTUGA(estado, accion) {
+      estado.accionDeLaTortuga = accion;
+    },
+
+    DETENER(estado) {
+      estado.modo = "edición";
+      estado.accionDeLaTortuga = "esperando";
+    },
+
+    EJECUTAR(estado) {
+      estado.modo = "ejecución";
+    },
+
   },
+
   actions: {},
   modules: {}
 })
