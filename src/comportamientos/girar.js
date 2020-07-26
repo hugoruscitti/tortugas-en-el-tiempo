@@ -1,9 +1,10 @@
 import Comportamiento from "@/comportamientos/comportamiento.js";
 
-class Rotar extends Comportamiento {
+class Girar extends Comportamiento {
 
-  constructor(grados) {
+  constructor(entidad, grados) {
     super();
+    this.entidad = entidad;
     this.grados = grados;
     this.gradosRecorridos = 0;
 
@@ -35,4 +36,4 @@ class Rotar extends Comportamiento {
 
 }
 
-export default Rotar;
+export default Girar;

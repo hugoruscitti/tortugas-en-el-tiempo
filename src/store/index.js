@@ -19,7 +19,7 @@ export default new Vuex.Store({
     },
 
     DEFINIR_ACCION_DE_LA_TORTUGA(estado, accion) {
-      estado.accionDeLaTortuga = accion;
+      estado.accionDeLaTortuga = accion.toLowerCase();
     },
 
     DETENER(estado) {

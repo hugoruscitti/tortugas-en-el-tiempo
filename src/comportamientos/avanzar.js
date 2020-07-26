@@ -2,8 +2,9 @@ import Comportamiento from "@/comportamientos/comportamiento.js";
 
 class Avanzar extends Comportamiento {
 
-  constructor(pasos) {
+  constructor(entidad, pasos) {
     super();
+    this.entidad = entidad;
     this.pasos = pasos;
   }
 

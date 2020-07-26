@@ -1,9 +1,5 @@
 class Comportamiento {
 
-  iniciar(entidad) {
-    this.entidad = entidad;
-  }
-
   actualizar() {}
 
   get rotacionEnRadianes() {

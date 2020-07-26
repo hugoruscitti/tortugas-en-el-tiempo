@@ -1,6 +1,6 @@
 import imagenes from "@/recursos/imagen_de_tortuga.js";
 import Avanzar from "@/comportamientos/avanzar.js";
-import Rotar from "@/comportamientos/rotar.js";
+import Girar from "@/comportamientos/girar.js";
 
 class Juego {
 
@@ -25,7 +25,6 @@ class Juego {
       rotacion: 0,
     };
 
-    this.comportamientos = [];
     this.comportamientoActual = null;
 
     this.dibujar();
@@ -74,37 +73,40 @@ class Juego {
     this.reiniciar();
   }
 
+  hacer(comportamiento, cuandoTermina) {
+    this.store.commit("DEFINIR_ACCION_DE_LA_TORTUGA", comportamiento.accion);
+    this.cuandoTermina = cuandoTermina;
+
+    if (this.comportamientoActual) {
+      throw new Error("Ya hay un comportamiento en ejecución.");
+    }
+
+    this.comportamientoActual = comportamiento;
+  }
+
   actualizar() {
     if (this.comportamientoActual) {
       let termina = this.comportamientoActual.actualizar();
 
       if (termina) {
-        this.adoptarSiguienteComportamiento();
+        this.cuandoTermina();
+        this.comportamientoActual = null;
+        this.cuandoTermina = null;
+        //this.store.commit("DEFINIR_ACCION_DE_LA_TORTUGA", "Reposando");
       }
-    } else {
-      this.adoptarSiguienteComportamiento();
-    }
-  }
-
-  adoptarSiguienteComportamiento() {
-    if (this.comportamientos.length > 0) {
-      this.comportamientoActual = this.comportamientos.shift();
-      this.comportamientoActual.iniciar(this.entidad);
-      this.store.commit("DEFINIR_ACCION_DE_LA_TORTUGA", this.comportamientoActual.accion);
-    } else {
-      this.comportamientoActual = null;
-      this.store.commit("DEFINIR_ACCION_DE_LA_TORTUGA", "Reposando");
     }
   }
 
   /* Comportamientos */
 
-  avanzar(cantidad) {
-    this.comportamientos.push(new Avanzar(cantidad));
+  avanzar(cantidad, cuandoTermina) {
+    let comportamiento = new Avanzar(this.entidad, cantidad);
+    this.hacer(comportamiento, cuandoTermina);
   }
 
-  rotar(grados) {
-    this.comportamientos.push(new Rotar(grados));
+  girarDerecha(grados, cuandoTermina) {
+    let comportamiento = new Girar(this.entidad, grados);
+    this.hacer(comportamiento, cuandoTermina);
   }
 
 }
