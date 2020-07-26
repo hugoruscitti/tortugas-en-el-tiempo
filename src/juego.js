@@ -1,4 +1,6 @@
-import imagenes from "@/imagen_de_tortuga.js";
+import imagenes from "@/recursos/imagen_de_tortuga.js";
+import Avanzar from "@/comportamientos/avanzar.js";
+import Rotar from "@/comportamientos/rotar.js";
 
 export default class {
 
@@ -16,7 +18,7 @@ export default class {
       x: 100,
       y: 100,
       rotacion: 0,
-      accion: "demo"
+      accion: ""
     };
 
     this.dibujar();
@@ -37,13 +39,10 @@ export default class {
   dibujar() {
     this.limpiar();
 
-    //this.contexto.rect(10, 10, 20, 20);
-    //this.contexto.fill();
     this.contexto.font = '14px verdana';
     this.contexto.fillText(this.entidad.accion, 10, 20);
 
     this.contexto.save();
-    //this.contexto.rotate(this.entidad.rotacion);
     this.contexto.translate(this.entidad.x, this.entidad.y);
     this.contexto.rotate((Math.PI / 180) * this.entidad.rotacion);
     this.contexto.translate(-16, -16);
@@ -91,7 +90,6 @@ export default class {
     }
   }
 
-
   /* Comportamientos */
 
   avanzar(cantidad) {
@@ -100,79 +98,6 @@ export default class {
 
   rotar(grados) {
     this.comportamientos.push(new Rotar(grados));
-  }
-
-}
-
-class Comportamiento {
-
-  iniciar(entidad) {
-    this.entidad = entidad;
-  }
-
-  actualizar() {}
-
-  get rotacionEnRadianes() {
-    return (this.entidad.rotacion * Math.PI) / 180 - Math.PI / 2;
-  }
-
-}
-
-
-class Avanzar extends Comportamiento {
-
-  constructor(pasos) {
-    super();
-    this.pasos = pasos;
-  }
-
-  actualizar() {
-    this.entidad.x += Math.cos(this.rotacionEnRadianes);
-    this.entidad.y += Math.sin(this.rotacionEnRadianes);
-    this.pasos -= 1;
-
-    if (this.pasos <= 0) {
-      return true;
-    }
-  }
-
-  get accion() {
-    return "Avanzando";
-  }
-
-}
-
-class Rotar extends Comportamiento {
-
-  constructor(grados) {
-    super();
-    this.grados = grados;
-    this.gradosRecorridos = 0;
-
-    if (grados > 0) {
-      this.delta = 1;
-    } else {
-      this.delta = -1;
-    }
-  }
-
-  actualizar() {
-    this.entidad.rotacion += this.delta;
-    this.gradosRecorridos += this.delta;
-
-    if (this.grados > 0) {
-      if (this.gradosRecorridos >= this.grados) {
-        return true;
-      }
-    } else {
-      if (this.gradosRecorridos <= this.grados) {
-        return true;
-      }
-    }
-  }
-
-  get accion() {
-    return "Girando";
   }
 
 }
