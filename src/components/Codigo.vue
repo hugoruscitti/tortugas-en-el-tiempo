@@ -1,26 +1,7 @@
 <template lang="html">
   <div class="bg-light-gray ph2 flex-grow-1">
 
-    <div class="">
-      <div class="verdana mb2 flex items-center">
-
-        <div v-if="modo == 'ejecución'">
-          <button @click="detener">Detener</button>
-        </div>
-
-        <div v-if="modo == 'edición'">
-          <button @click="ejecutar">Ejecutar</button>
-        </div>
-
-        <div v-if="modo == 'pausa'">
-
-        </div>
-
-        <span v-if="error" class="pl2 red">{{error}}</span>
-
-      </div>
-
-    </div>
+    <BotonesDeEstado :error="error" :modo="modo" @cuandoEjecuta="ejecutar" @cuandoDetiene="detener"/>
 
     <div class="flex">
       <textarea
@@ -51,9 +32,13 @@
 <script>
 import instanciaDeJuego from "@/juego.js";
 import agregarCodigoEnTextArea from "@/utilidades/agregar_codigo_en_textarea.js";
-
+import BotonesDeEstado from "@/components/BotonesDeEstado.vue";
 
 export default {
+
+  components: {
+    BotonesDeEstado
+  },
 
   data() {
     return {

@@ -10,6 +10,10 @@ export default function(el, codigo) {
   if (distanciaAlSaltoDeLinea !== -1) {
     start += distanciaAlSaltoDeLinea;
     end += distanciaAlSaltoDeLinea;
+  } else {
+    // si está en la última linea del archivo se mueve al final.
+    start += text.substring(end, text.length).length;
+    end += text.substring(end, text.length).length;
   }
 
   const before = text.substring(0, start)
