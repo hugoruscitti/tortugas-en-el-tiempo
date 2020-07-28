@@ -1,43 +1,37 @@
 <template lang="html">
-  <div class="bg-light-gray ph2 flex-grow-1">
+  <div class="ph2 flex-grow-1">
 
     <BotonesDeEstado :error="error" :modo="modo" @cuandoEjecuta="ejecutar" @cuandoDetiene="detener"/>
 
     <div class="flex">
+
       <textarea
         @blur="cuandoCambia"
         ref="textarea"
+        spellcheck="false"
         :value="codigo"
         :class="{'o-50': enEjecucion}"
         class="verdana lh-copy ph2 w-100 w4 h5 flex-grow-1"></textarea>
 
-        <div
-          class="ml2 verdana truncate w5 no-user-select"
-          :class=" {'o-50 no-pointer-events': enEjecucion}"
-        >
-          <div class="i gray ph2 pb2">
-            Funciones disponibles
-          </div>
+      <PanelDeFunciones :enEjecucion="enEjecucion" @cuandoQuiereAgregarCodigo="agregar"/>
 
-          <div @click="agregar('avanzar(10)')" class="truncate pointer pa2 hover-bg-black-10">Avanzar</div>
-          <div @click="agregar('girarDerecha(90)')" class="truncate pointer pa2 hover-bg-black-10">Girar Hacia La Derecha</div>
-        </div>
-
-      </div>
-
+    </div>
 
   </div>
+
 </template>
 
 <script>
 import instanciaDeJuego from "@/juego.js";
 import agregarCodigoEnTextArea from "@/utilidades/agregar_codigo_en_textarea.js";
 import BotonesDeEstado from "@/components/BotonesDeEstado.vue";
+import PanelDeFunciones from "@/components/PanelDeFunciones.vue";
 
 export default {
 
   components: {
-    BotonesDeEstado
+    BotonesDeEstado,
+    PanelDeFunciones
   },
 
   data() {
@@ -79,8 +73,19 @@ export default {
           return instanciaDeJuego.girarDerecha(grados, cuandoTermina);
         }
 
+        var subirLapiz = function(cuandoTermina) {
+          return instanciaDeJuego.subirLapiz(cuandoTermina);
+        }
+
+        var bajarLapiz = function(cuandoTermina) {
+          return instanciaDeJuego.bajarLapiz(cuandoTermina);
+        }
+
         _in.setProperty(contexto, 'avanzar', _in.createAsyncFunction(avanzar));
         _in.setProperty(contexto, 'girarDerecha', _in.createAsyncFunction(girarDerecha));
+        _in.setProperty(contexto, 'subirLapiz', _in.createAsyncFunction(subirLapiz));
+        _in.setProperty(contexto, 'bajarLapiz', _in.createAsyncFunction(bajarLapiz));
+
       }
 
       let interprete = new Interpreter(codigo, inicializar);
@@ -90,12 +95,65 @@ export default {
 
     detener() {
       this.juego.detener();
+      this.limpiarTextoSeleccionado();
+    },
+
+    resaltarLineaDeCódigoEjecutada(interprete) {
+      // Obtener linea en ejecución
+      var start = 0;
+      var end = 0;
+
+      // Obtiene el rango de código que se está ejecutando.
+      if (interprete.stateStack.length) {
+        var node = interprete.stateStack[interprete.stateStack.length - 1].node;
+
+        // Solo intenta resaltar los llamados a funciones, todo lo demás
+        // se omite.
+        if (node.type !== "CallExpression") {
+          return
+        }
+
+        start = node.start;
+        end = node.end;
+      }
+
+      this.seleccionar(start, end);
+    },
+
+    limpiarTextoSeleccionado() {
+      if (document.selection) {
+        document.selection.empty();
+      } else {
+        if (window.getSelection) {
+          window.getSelection().removeAllRanges();
+        }
+      }
+    },
+
+    seleccionar(start, end) {
+      var textarea = this.$refs.textarea;
+
+      if (textarea.createTextRange) {
+        var selRange = textarea.createTextRange();
+        selRange.collapse(true);
+        selRange.moveStart('character', start);
+        selRange.moveEnd('character', end);
+        selRange.select();
+      } else if (textarea.setSelectionRange) {
+        textarea.setSelectionRange(start, end);
+      } else if (textarea.selectionStart) {
+        textarea.selectionStart = start;
+        textarea.selectionEnd = end;
+      }
+
+      textarea.focus();
     },
 
     /*
      * Añade código en el textarea.
      */
     agregar(codigo) {
+      this.limpiarTextoSeleccionado();
       agregarCodigoEnTextArea(this.$refs.textarea, codigo)
     },
 
@@ -119,17 +177,33 @@ export default {
         }
       }
 
-
-      let store = this.$store;
       /*
        * Como el interprete ejecuta código asincrónico se tiene que llamar a run
        * periódicamente hasta que retorne `false`.
        */
-      function ejecutarInterprete() {
-        if (interprete.run()) {
+      let ejecutarInterprete = () => {
+        let enCurso = null;
+        try {
+          enCurso = interprete.run();
+        } catch (e) {
+          this.error = e.toString();
+        }
+
+        this.resaltarLineaDeCódigoEjecutada(interprete);
+
+        if (enCurso) {
+
+          if (this.$store.state.modo !== "ejecución") {
+            this.limpiarTextoSeleccionado();
+            this.$store.commit("DEFINIR_ACCION_DE_LA_TORTUGA", "Esperando");
+            return;
+          }
+
           setTimeout(ejecutarInterprete, 1);
+
         } else {
-          store.commit("DEFINIR_ACCION_DE_LA_TORTUGA", "Esperando");
+          this.limpiarTextoSeleccionado();
+          this.$store.commit("DEFINIR_ACCION_DE_LA_TORTUGA", "Esperando");
         }
       }
 
@@ -142,11 +216,4 @@ export default {
 
 
 <style media="screen">
-.no-user-select {
-  user-select: none;
-}
-
-.no-pointer-events {
-  pointer-events: none;
-}
 </style>

@@ -1,6 +1,8 @@
 import imagenes from "@/recursos/imagen_de_tortuga.js";
 import Avanzar from "@/comportamientos/avanzar.js";
 import Girar from "@/comportamientos/girar.js";
+import SubirLapiz from "@/comportamientos/subir-lapiz.js";
+import BajarLapiz from "@/comportamientos/bajar-lapiz.js";
 
 class Juego {
 
@@ -8,14 +10,13 @@ class Juego {
 
   }
 
-  async iniciar(canvas, vuexStore) {
+  async iniciar(canvas, canvasDeFondo, vuexStore) {
     this.canvas = canvas;
+    this.canvasDeFondo = canvasDeFondo;
     this.store = vuexStore;
 
     await this.crearTortuga();
     this.reiniciar();
-
-    window.juego = this;
   }
 
   reiniciar() {
@@ -23,6 +24,7 @@ class Juego {
       x: 150,
       y: 150,
       rotacion: 0,
+      color: null,
     };
 
     this.comportamientoActual = null;
@@ -92,6 +94,7 @@ class Juego {
         this.cuandoTermina();
         this.comportamientoActual = null;
         this.cuandoTermina = null;
+
         //this.store.commit("DEFINIR_ACCION_DE_LA_TORTUGA", "Reposando");
       }
     }
@@ -100,12 +103,22 @@ class Juego {
   /* Comportamientos */
 
   avanzar(cantidad, cuandoTermina) {
-    let comportamiento = new Avanzar(this.entidad, cantidad);
+    let comportamiento = new Avanzar(this.canvasDeFondo, this.entidad, cantidad);
     this.hacer(comportamiento, cuandoTermina);
   }
 
   girarDerecha(grados, cuandoTermina) {
     let comportamiento = new Girar(this.entidad, grados);
+    this.hacer(comportamiento, cuandoTermina);
+  }
+
+  subirLapiz(cuandoTermina) {
+    let comportamiento = new SubirLapiz(this.entidad);
+    this.hacer(comportamiento, cuandoTermina);
+  }
+
+  bajarLapiz(cuandoTermina) {
+    let comportamiento = new BajarLapiz(this.entidad);
     this.hacer(comportamiento, cuandoTermina);
   }
 

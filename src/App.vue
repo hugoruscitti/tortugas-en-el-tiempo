@@ -1,5 +1,5 @@
 <template>
-<div class="bg-light-gray vh-100">
+<div class="fondo-gris vh-100">
   <div class="pa2 verdana">
     <router-link class="link" to="/">Editor</router-link> |
     <router-link class="link" to="/AcercaDe">Acerca de...</router-link>
