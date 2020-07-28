@@ -24,12 +24,13 @@ class Juego {
       x: 150,
       y: 150,
       rotacion: 0,
-      color: null,
+      color: "black",
     };
 
     this.comportamientoActual = null;
 
     this.dibujar();
+    this.limpiarFondo();
   }
 
   async crearTortuga() {
@@ -40,24 +41,27 @@ class Juego {
     })
   }
 
-  get contexto() {
-    return this.canvas.getContext("2d");
-  }
-
   dibujar() {
     this.limpiar();
+    let contexto = this.canvas.getContext("2d");
 
-    this.contexto.save();
-    this.contexto.translate(this.entidad.x, this.entidad.y);
-    this.contexto.rotate((Math.PI / 180) * this.entidad.rotacion);
-    this.contexto.translate(-16, -16);
-    this.contexto.drawImage(this.tortuga, 0, 0)
+    contexto.save();
+    contexto.translate(this.entidad.x, this.entidad.y);
+    contexto.rotate((Math.PI / 180) * this.entidad.rotacion);
+    contexto.translate(-16, -16);
+    contexto.drawImage(this.tortuga, 0, 0)
 
-    this.contexto.restore();
+    contexto.restore();
   }
 
   limpiar() {
-    this.contexto.clearRect(0, 0, 300, 300);
+    let contexto = this.canvas.getContext("2d");
+    contexto.clearRect(0, 0, 300, 300);
+  }
+
+  limpiarFondo() {
+    let contexto = this.canvasDeFondo.getContext("2d");
+    contexto.clearRect(0, 0, 300, 300);
   }
 
   ejecutar() {

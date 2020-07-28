@@ -17,7 +17,9 @@ class Avanzar extends Comportamiento {
     this.entidad.y += Math.sin(this.rotacionEnRadianes);
     this.pasos -= 1;
 
-    this.dibujarLinea();
+    if (this.entidad.color) {
+      this.dibujarLinea();
+    }
 
     this.posicion_anterior = { x: this.entidad.x, y: this.entidad.y }
 
