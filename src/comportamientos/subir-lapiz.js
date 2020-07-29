@@ -16,6 +16,10 @@ class SubirLapiz extends Comportamiento {
     return "Subiendo lapiz";
   }
 
+  guardarEstado(historia) {
+    historia.registrarCambio(this.entidad);
+  }
+
 }
 
 export default SubirLapiz;

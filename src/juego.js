@@ -3,11 +3,12 @@ import Avanzar from "@/comportamientos/avanzar.js";
 import Girar from "@/comportamientos/girar.js";
 import SubirLapiz from "@/comportamientos/subir-lapiz.js";
 import BajarLapiz from "@/comportamientos/bajar-lapiz.js";
+import Historia from "@/historia.js";
 
 class Juego {
 
   constructor() {
-
+    this.historia = new Historia(this);
   }
 
   async iniciar(canvas, canvasDeFondo, vuexStore) {
@@ -43,6 +44,10 @@ class Juego {
 
   dibujar() {
     this.limpiar();
+    this.dibujarTortuga();
+  }
+
+  dibujarTortuga() {
     let contexto = this.canvas.getContext("2d");
 
     contexto.save();
@@ -52,6 +57,41 @@ class Juego {
     contexto.drawImage(this.tortuga, 0, 0)
 
     contexto.restore();
+  }
+
+  redibujarPasoDesdeHistoria(numeroDePaso) {
+    this.limpiarFondo();
+    let pasos = this.historia.obtenerPasosHasta(numeroDePaso);
+
+    // Vuelve a dibujar las lineas desde el paso 0 hasta el
+    // paso actual.
+    pasos.map(estado => {
+      if (estado.tipo === "movimiento-de-dibujado") {
+        this.dibujarLineaDesdeHistoria(estado.posicion_inicial, estado.entidad, "black");
+      }
+    })
+
+    // Dibuja solamente la tortuga del último paso.
+    let pasoFinal = this.historia.obtenerPaso(numeroDePaso);
+    this.entidad = pasoFinal.entidad;
+    this.limpiar();
+    this.dibujarTortuga();
+
+    // Si el paso actual justo termina de dibujar una linea la dibuja
+    // pero en color azúl.
+    if (pasoFinal.tipo === "movimiento-de-dibujado") {
+      this.dibujarLineaDesdeHistoria(pasoFinal.posicion_inicial, pasoFinal.entidad, "#05d305");
+    }
+  }
+
+  dibujarLineaDesdeHistoria(puntoOrigen, puntoDestino, color) {
+    let contexto = this.canvasDeFondo.getContext("2d");
+    contexto.beginPath();
+    contexto.moveTo(puntoOrigen.x, puntoOrigen.y);
+    contexto.lineTo(puntoDestino.x, puntoDestino.y);
+    contexto.lineWidth = 2;
+    contexto.strokeStyle = color;
+    contexto.stroke();
   }
 
   limpiar() {
@@ -71,12 +111,27 @@ class Juego {
     }, 1000 / 60)
 
     this.store.commit("EJECUTAR");
+    this.historia.reiniciar();
+
+    // cuando comienza la ejecución siempre registrar
+    // el punto inicial, así en modo pausa puede retroceder hasta
+    // el cuadro 0.
+    //
+    // el resto de los cuadros se registran por el mismo comportamiento
+    // cuando finaliza la ejecución del comportamiento.
+    this.historia.registrarCambio(this.entidad);
+
   }
 
   detener() {
     this.store.commit("DETENER");
     clearInterval(this.setIntervalID);
     this.reiniciar();
+  }
+
+  pausar() {
+    this.store.commit("PAUSAR");
+    clearInterval(this.setIntervalID);
   }
 
   hacer(comportamiento, cuandoTermina) {
@@ -95,6 +150,7 @@ class Juego {
       let termina = this.comportamientoActual.actualizar();
 
       if (termina) {
+        this.comportamientoActual.guardarEstado(this.historia);
         this.cuandoTermina();
         this.comportamientoActual = null;
         this.cuandoTermina = null;

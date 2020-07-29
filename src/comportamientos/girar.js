@@ -34,6 +34,10 @@ class Girar extends Comportamiento {
     return "Girando";
   }
 
+  guardarEstado(historia) {
+    historia.registrarCambio(this.entidad);
+  }
+
 }
 
 export default Girar;

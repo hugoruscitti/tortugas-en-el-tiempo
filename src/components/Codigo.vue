@@ -1,7 +1,11 @@
 <template lang="html">
   <div class="ph2 flex-grow-1">
 
-    <BotonesDeEstado :error="error" :modo="modo" @cuandoEjecuta="ejecutar" @cuandoDetiene="detener"/>
+    <BotonesDeEstado :error="error" :modo="modo"
+      @cuandoEjecuta="ejecutar"
+      @cuandoDetiene="detener"
+      @cuandoPulsaPausa="pausar"
+    />
 
     <div class="flex">
 
@@ -10,10 +14,10 @@
         ref="textarea"
         spellcheck="false"
         :value="codigo"
-        :class="{'o-50': enEjecucion}"
+        :class="{'o-50': desactivado}"
         class="verdana lh-copy ph2 w-100 w4 h5 flex-grow-1"></textarea>
 
-      <PanelDeFunciones :enEjecucion="enEjecucion" @cuandoQuiereAgregarCodigo="agregar"/>
+      <PanelDeFunciones :enEjecucion="desactivado" @cuandoQuiereAgregarCodigo="agregar"/>
 
     </div>
 
@@ -51,8 +55,8 @@ export default {
     modo() {
       return this.$store.state.modo;
     },
-    enEjecucion() {
-      return this.$store.state.modo == "ejecución";
+    desactivado() {
+      return this.$store.state.modo == "ejecución" || this.$store.state.modo == "pausa";
     }
   },
 
@@ -95,6 +99,11 @@ export default {
 
     detener() {
       this.juego.detener();
+      this.limpiarTextoSeleccionado();
+    },
+
+    pausar() {
+      this.juego.pausar();
       this.limpiarTextoSeleccionado();
     },
 

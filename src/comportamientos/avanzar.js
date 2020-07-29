@@ -42,6 +42,14 @@ class Avanzar extends Comportamiento {
     return "Avanzando";
   }
 
+  guardarEstado(historia) {
+    if (this.entidad.color) {
+      historia.registrarMovimientoDibujando(this.posicion_inicial, this.entidad);
+    } else {
+      historia.registrarCambio(this.entidad);
+    }
+  }
+
 }
 
 export default Avanzar;

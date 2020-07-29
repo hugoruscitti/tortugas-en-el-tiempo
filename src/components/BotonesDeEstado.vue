@@ -1,15 +1,32 @@
 <template lang="html">
   <div class="verdana mb2 flex items-center">
 
-    <div v-if="modo == 'ejecución'">
-      <button class="boton" @click="$emit('cuandoDetiene')">◼ Detener</button>
+    <div class="flex" v-if="modo == 'ejecución'">
+      <button class="boton flex" @click="$emit('cuandoDetiene')">
+        <Icono nombre="detener"/>
+        <div class="pl2">Detener</div>
+      </button>
+
+      <button class="ml2 boton flex" @click="$emit('cuandoPulsaPausa')">
+        <Icono nombre="pausa"/>
+        <div class="pl2">Pausar e inspeccionar</div>
+      </button>
     </div>
 
-    <div v-if="modo == 'edición'">
-      <button class="boton" @click="$emit('cuandoEjecuta')">► Ejecutar</button>
+    <div class="flex" v-if="modo == 'edición'">
+      <button class="boton flex" @click="$emit('cuandoEjecuta')">
+        <Icono nombre="ejecutar"/>
+        <div class="pl2">Ejecutar</div>
+      </button>
     </div>
 
-    <div v-if="modo == 'pausa'">
+    <div class="flex" v-if="modo == 'pausa'">
+      <button class="boton flex" @click="$emit('cuandoDetiene')">
+        <Icono nombre="detener"/>
+        <div class="pl2">Detener</div>
+      </button>
+
+      <Deslizador/>
 
     </div>
 
@@ -19,10 +36,17 @@
 </template>
 
 <script>
+import Icono from "@/components/Icono.vue";
+import Deslizador from "@/components/Deslizador.vue";
+
 export default {
   props: {
     error: { type: String },
     modo: { type: String }
+  },
+  components: {
+    Icono,
+    Deslizador
   }
 }
 </script>

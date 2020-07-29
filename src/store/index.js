@@ -7,7 +7,7 @@ export default new Vuex.Store({
 
   state: {
     contador: 0,
-    codigo: ['avanzar(10)', 'girarDerecha(10)'].join("\n"),
+    codigo: ['avanzar(40)', 'girarDerecha(50)', 'avanzar(40)'].join("\n"),
     modo: "edición", // "ejecución", "edición" y "pausa"
     accionDeLaTortuga: "esperando",
   },
@@ -29,6 +29,11 @@ export default new Vuex.Store({
 
     EJECUTAR(estado) {
       estado.modo = "ejecución";
+    },
+
+    PAUSAR(estado) {
+      estado.modo = "pausa";
+      estado.accionDeLaTortuga = "esperando";
     },
 
   },
