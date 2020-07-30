@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Editor from '../views/Editor.vue'
+import AcercaDe from "../views/AcercaDe.vue";
 
 Vue.use(VueRouter)
 
-  const routes = [
-  {
+const routes = [{
     path: '/',
     name: 'Editor',
     component: Editor
@@ -13,10 +13,7 @@ Vue.use(VueRouter)
   {
     path: '/AcercaDe',
     name: 'AcercaDe',
-    // route level code-splitting
-    // this generates a separate chunk (AcercaDe.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "AcercaDe" */ '../views/AcercaDe.vue')
+    component: AcercaDe
   }
 ]
 

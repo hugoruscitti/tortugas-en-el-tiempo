@@ -13,3 +13,7 @@
 .no-pointer-events {
   pointer-events: none;
 }
+
+.linea {
+  background-color: #b0ccff;
+}

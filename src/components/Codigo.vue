@@ -7,15 +7,10 @@
       @cuandoPulsaPausa="pausar"
     />
 
-    <div class="flex">
+    <div class="flex" :class="{'o-50': desactivado}">
 
-      <textarea
-        @blur="cuandoCambia"
-        ref="textarea"
-        spellcheck="false"
-        :value="codigo"
-        :class="{'o-50': desactivado}"
-        class="verdana lh-copy ph2 w-100 w4 h5 flex-grow-1"></textarea>
+      <!-- contenedor para el editor Monaco -->
+      <div class="h5 w5 ba b-gray flex-grow-1 bg-white" ref="contenedor"></div>
 
       <PanelDeFunciones :enEjecucion="desactivado" @cuandoQuiereAgregarCodigo="agregar"/>
 
@@ -27,9 +22,12 @@
 
 <script>
 import instanciaDeJuego from "@/juego.js";
-import agregarCodigoEnTextArea from "@/utilidades/agregar_codigo_en_textarea.js";
 import BotonesDeEstado from "@/components/BotonesDeEstado.vue";
 import PanelDeFunciones from "@/components/PanelDeFunciones.vue";
+
+
+import * as monaco from 'monaco-editor';
+
 
 export default {
 
@@ -46,6 +44,51 @@ export default {
 
   mounted() {
     this.juego = instanciaDeJuego;
+
+    this.decorations = [];
+    this.configurarAutocompletado();
+
+    this.editor = monaco.editor.create(this.$refs.contenedor, {
+      value: this.codigo,
+      language: 'typescript',
+      autoIndent: true,
+      formatOnPaste: true,
+      formatOnType: true,
+      scrollBeyondLastLine: true,
+      contextmenu: false,
+      minimap: { enabled: false },
+      fontSize: 16,
+      automaticLayout: true,
+      hover: { enabled: false },
+    });
+
+    window.onresize = () => {
+      this.editor.layout();
+    };
+
+    this.editor.onDidBlurEditorText(() => {
+      this.cuandoCambia(this.editor.getModel().getValue());
+    });
+
+    window.editor = this.editor;
+
+    //this.seleccionar(1);
+    this.seleccionar(2);
+
+    this.ajustarTamañoDelEditor();
+  },
+
+  beforeDestroy() {
+    this.editor.getModel().dispose();
+    this.editor.dispose();
+    this.editor = null;
+    clearTimeout(this.timeoutParaAjustarTamaño);
+  },
+
+  watch: {
+    desactivado: function(_, nuevo) {
+      this.editor.updateOptions({ readOnly: !nuevo });
+    },
   },
 
   computed: {
@@ -61,8 +104,8 @@ export default {
   },
 
   methods: {
-    cuandoCambia(e) {
-      this.$store.commit("CAMBIAR_CÓDIGO", e.target.value);
+    cuandoCambia(texto) {
+      this.$store.commit("CAMBIAR_CÓDIGO", texto);
     },
 
     crearInterprete(codigo) {
@@ -102,15 +145,50 @@ export default {
       this.limpiarTextoSeleccionado();
     },
 
+    ajustarTamañoDelEditor() {
+      this.editor.layout();
+
+      this.timeoutParaAjustarTamaño = setTimeout(() => {
+        this.ajustarTamañoDelEditor();
+      }, 500);
+    },
+
     pausar() {
       this.juego.pausar();
       this.limpiarTextoSeleccionado();
     },
 
+    /**
+     * Activa el autocompletado de las palabras reservadas de TypeScript
+     * y las funciones de dibujado de la tortuga. Todas las otras API
+     * del DOM, fechas o Math se desactivan por completo.
+     */
+    configurarAutocompletado() {
+      monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+        noLib: true,
+        allowNonTsExtensions: true
+      });
+
+      let data = `
+        /** Se mueve hacia adelante los pasos indicados */
+        declare function avanzar(pasos: number);
+
+        /** Gira tantos grados como se indique en el argumento */
+        declare function girarDerecha(grados: number);
+
+        /** Desactiva el dibujado de lineas mientras avanza */
+        declare function subirLapiz();
+
+        /** Activa el dibujado de lineas mientras avanza */
+        declare function subirLapiz();
+      `;
+
+      monaco.languages.typescript.typescriptDefaults.addExtraLib(data, 'funciones.d.ts');
+    },
+
     resaltarLineaDeCódigoEjecutada(interprete) {
       // Obtener linea en ejecución
-      var start = 0;
-      var end = 0;
+      var start = -1;
 
       // Obtiene el rango de código que se está ejecutando.
       if (interprete.stateStack.length) {
@@ -123,47 +201,59 @@ export default {
         }
 
         start = node.start;
-        end = node.end;
       }
 
-      this.seleccionar(start, end);
+      if (start !== -1) {
+        this.seleccionar(this.obtenerLineaDesdePosicion(start));
+      }
+    },
+
+    obtenerLineaDesdePosicion(start) {
+      return this.codigo.slice(0, start).split("\n").length;
     },
 
     limpiarTextoSeleccionado() {
-      if (document.selection) {
-        document.selection.empty();
-      } else {
-        if (window.getSelection) {
-          window.getSelection().removeAllRanges();
-        }
-      }
+      /*
+      let rango = new monaco.Range(1, 1, 1, 1);
+      this.decorations = [];
+
+      this.editor.deltaDecorations(this.decorations, [{
+        range: rango,
+        options: {}
+      }]);
+      */
     },
 
-    seleccionar(start, end) {
-      var textarea = this.$refs.textarea;
+    seleccionar(linea) {
+      let rango = new monaco.Range(1, 1, 1, 1);
+      this.editor.deltaDecorations(this.decorations, [{
+        range: rango,
+        options: {}
+      }]);
 
-      if (textarea.createTextRange) {
-        var selRange = textarea.createTextRange();
-        selRange.collapse(true);
-        selRange.moveStart('character', start);
-        selRange.moveEnd('character', end);
-        selRange.select();
-      } else if (textarea.setSelectionRange) {
-        textarea.setSelectionRange(start, end);
-      } else if (textarea.selectionStart) {
-        textarea.selectionStart = start;
-        textarea.selectionEnd = end;
-      }
+      let listado = [{
+        range: new monaco.Range(linea, 1, linea, 1),
+        options: {
+          isWholeLine: true,
+          className: "linea"
+        }
+      }];
 
-      textarea.focus();
+      this.decorations = this.editor.deltaDecorations(this.decorations, listado);
     },
 
     /*
      * Añade código en el textarea.
      */
     agregar(codigo) {
-      this.limpiarTextoSeleccionado();
-      agregarCodigoEnTextArea(this.$refs.textarea, codigo)
+      //this.limpiarTextoSeleccionado();
+
+      var selection = this.editor.getSelection();
+      var range = new monaco.Range(selection.startLineNumber, selection.startColumn, selection.endLineNumber, selection.endColumn);
+      var id = { major: 1, minor: 1 };
+      var text = codigo;
+      var op = { identifier: id, range: range, text: text, forceMoveMarkers: true };
+      this.editor.executeEdits("my-source", [op]);
     },
 
     ejecutar() {
