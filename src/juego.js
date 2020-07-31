@@ -172,6 +172,11 @@ class Juego {
     this.hacer(comportamiento, cuandoTermina);
   }
 
+  girarIzquierda(grados, cuandoTermina) {
+    let comportamiento = new Girar(this.entidad, -grados);
+    this.hacer(comportamiento, cuandoTermina);
+  }
+
   subirLapiz(cuandoTermina) {
     let comportamiento = new SubirLapiz(this.entidad);
     this.hacer(comportamiento, cuandoTermina);

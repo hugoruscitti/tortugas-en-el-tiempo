@@ -10,9 +10,9 @@
     <div class="flex" :class="{'o-50': desactivado}">
 
       <!-- contenedor para el editor Monaco -->
-      <div class="h5 w5 ba b-gray flex-grow-1 bg-white" ref="contenedor"></div>
+      <div class="h5 w5 ba b--gray flex-grow-1 bg-white" ref="contenedor"></div>
 
-      <PanelDeFunciones :enEjecucion="desactivado" @cuandoQuiereAgregarCodigo="agregar"/>
+      <PanelDeFunciones :enEjecucion="desactivado" @cuandoQuiereAgregarCodigo="agregarCodigo"/>
 
     </div>
 
@@ -24,8 +24,6 @@
 import instanciaDeJuego from "@/juego.js";
 import BotonesDeEstado from "@/components/BotonesDeEstado.vue";
 import PanelDeFunciones from "@/components/PanelDeFunciones.vue";
-
-
 import * as monaco from 'monaco-editor';
 
 
@@ -72,9 +70,6 @@ export default {
 
     window.editor = this.editor;
 
-    //this.seleccionar(1);
-    this.seleccionar(2);
-
     this.ajustarTamañoDelEditor();
   },
 
@@ -120,6 +115,10 @@ export default {
           return instanciaDeJuego.girarDerecha(grados, cuandoTermina);
         }
 
+        var girarIzquierda = function(grados, cuandoTermina) {
+          return instanciaDeJuego.girarIzquierda(grados, cuandoTermina);
+        }
+
         var subirLapiz = function(cuandoTermina) {
           return instanciaDeJuego.subirLapiz(cuandoTermina);
         }
@@ -130,9 +129,9 @@ export default {
 
         _in.setProperty(contexto, 'avanzar', _in.createAsyncFunction(avanzar));
         _in.setProperty(contexto, 'girarDerecha', _in.createAsyncFunction(girarDerecha));
+        _in.setProperty(contexto, 'girarIzquierda', _in.createAsyncFunction(girarIzquierda));
         _in.setProperty(contexto, 'subirLapiz', _in.createAsyncFunction(subirLapiz));
         _in.setProperty(contexto, 'bajarLapiz', _in.createAsyncFunction(bajarLapiz));
-
       }
 
       let interprete = new Interpreter(codigo, inicializar);
@@ -173,14 +172,17 @@ export default {
         /** Se mueve hacia adelante los pasos indicados */
         declare function avanzar(pasos: number);
 
-        /** Gira tantos grados como se indique en el argumento */
+        /** Gira hacia la derecha tantos grados como se indique en el argumento */
         declare function girarDerecha(grados: number);
+
+        /** Gira hacia la izquierda tantos grados como se indique en el argumento */
+        declare function girarIzquierda(grados: number);
 
         /** Desactiva el dibujado de lineas mientras avanza */
         declare function subirLapiz();
 
         /** Activa el dibujado de lineas mientras avanza */
-        declare function subirLapiz();
+        declare function bajarLapiz();
       `;
 
       monaco.languages.typescript.typescriptDefaults.addExtraLib(data, 'funciones.d.ts');
@@ -213,15 +215,12 @@ export default {
     },
 
     limpiarTextoSeleccionado() {
-      /*
       let rango = new monaco.Range(1, 1, 1, 1);
-      this.decorations = [];
 
       this.editor.deltaDecorations(this.decorations, [{
         range: rango,
         options: {}
       }]);
-      */
     },
 
     seleccionar(linea) {
@@ -242,18 +241,32 @@ export default {
       this.decorations = this.editor.deltaDecorations(this.decorations, listado);
     },
 
-    /*
-     * Añade código en el textarea.
+    /**
+     * Añade código en editor cuando se pulsa en un función del panel derecho.
      */
-    agregar(codigo) {
-      //this.limpiarTextoSeleccionado();
+    agregarCodigo(codigo) {
+      var position = this.editor.getPosition();
 
       var selection = this.editor.getSelection();
-      var range = new monaco.Range(selection.startLineNumber, selection.startColumn, selection.endLineNumber, selection.endColumn);
-      var id = { major: 1, minor: 1 };
-      var text = codigo;
-      var op = { identifier: id, range: range, text: text, forceMoveMarkers: true };
-      this.editor.executeEdits("my-source", [op]);
+
+      var texto_completo = this.editor.getModel().getValue();
+      var lista = texto_completo.split('\n');
+
+      if (lista.length === 1 && lista[0] === "") {
+        lista = [];
+      }
+
+      lista = lista.
+      slice(0, selection.startLineNumber).
+      concat([codigo]).
+      concat(lista.slice(selection.startLineNumber, lista.length))
+
+      this.editor.getModel().setValue(lista.join("\n"));
+
+      position.column = 1;
+      position.lineNumber += 1;
+      this.editor.setPosition(position);
+      this.editor.focus();
     },
 
     ejecutar() {

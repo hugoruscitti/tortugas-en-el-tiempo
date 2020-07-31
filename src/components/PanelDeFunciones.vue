@@ -20,6 +20,7 @@ export default {
       funciones: [
         { titulo: "Avanzar", codigo: "avanzar(10)" },
         { titulo: "Girar Hacia La Derecha", codigo: "girarDerecha(45)" },
+        { titulo: "Girar Hacia La Izquierda", codigo: "girarIzquierda(45)" },
         { titulo: "Subir el lapiz", codigo: "subirLapiz()" },
         { titulo: "Bajar el lapiz", codigo: "bajarLapiz()" },
       ]
