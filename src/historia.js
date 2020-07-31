@@ -12,6 +12,7 @@ class Historia {
   registrarMovimientoDibujando(posicion_inicial, entidad) {
     this.pasos.push({
       tipo: "movimiento-de-dibujado",
+      linea: this.juego.obtenerUltimaLineaEjecutada(),
       posicion_inicial: JSON.parse(JSON.stringify(posicion_inicial)),
       entidad: JSON.parse(JSON.stringify(entidad)),
     });
@@ -20,6 +21,7 @@ class Historia {
   registrarCambio(entidad) {
     this.pasos.push({
       tipo: "cambio",
+      linea: this.juego.obtenerUltimaLineaEjecutada(),
       entidad: JSON.parse(JSON.stringify(entidad))
     });
   }

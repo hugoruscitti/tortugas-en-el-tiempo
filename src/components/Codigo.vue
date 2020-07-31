@@ -84,6 +84,13 @@ export default {
     desactivado: function(_, nuevo) {
       this.editor.updateOptions({ readOnly: !nuevo });
     },
+    ultimaLineaEjecutada: function(numeroDeLinea) {
+      if (numeroDeLinea !== 0) {
+        this.seleccionar(numeroDeLinea);
+      } else {
+        this.limpiarTextoSeleccionado();
+      }
+    }
   },
 
   computed: {
@@ -95,6 +102,9 @@ export default {
     },
     desactivado() {
       return this.$store.state.modo == "ejecución" || this.$store.state.modo == "pausa";
+    },
+    ultimaLineaEjecutada() {
+      return this.$store.state.ultimaLineaEjecutada;
     }
   },
 
@@ -206,7 +216,9 @@ export default {
       }
 
       if (start !== -1) {
-        this.seleccionar(this.obtenerLineaDesdePosicion(start));
+        let numeroDeLinea = this.obtenerLineaDesdePosicion(start);
+        this.seleccionar(numeroDeLinea);
+        this.$store.commit("SELECCIONAR_LINEA", numeroDeLinea);
       }
     },
 

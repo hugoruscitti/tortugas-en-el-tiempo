@@ -23,6 +23,15 @@ export default {
         { titulo: "Girar Hacia La Izquierda", codigo: "girarIzquierda(45)" },
         { titulo: "Subir el lapiz", codigo: "subirLapiz()" },
         { titulo: "Bajar el lapiz", codigo: "bajarLapiz()" },
+        {
+          titulo: "Cuadrado",
+          codigo: [
+            "for (var i = 0; i < 4; i++) {",
+            "  avanzar(20)",
+            "  girarDerecha(90)",
+            "}"
+          ].join("\n")
+        }
       ]
     }
   },

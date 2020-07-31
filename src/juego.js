@@ -9,6 +9,7 @@ class Juego {
 
   constructor() {
     this.historia = new Historia(this);
+    this.ultimaLineaEjecutada = 0;
   }
 
   async iniciar(canvas, canvasDeFondo, vuexStore) {
@@ -20,6 +21,10 @@ class Juego {
     this.reiniciar();
   }
 
+  obtenerUltimaLineaEjecutada() {
+    return this.store.state.ultimaLineaEjecutada;
+  }
+
   reiniciar() {
     this.entidad = {
       x: 150,
@@ -29,6 +34,7 @@ class Juego {
     };
 
     this.comportamientoActual = null;
+    this.ultimaLineaEjecutada = 0;
 
     this.dibujar();
     this.limpiarFondo();
@@ -82,6 +88,8 @@ class Juego {
     if (pasoFinal.tipo === "movimiento-de-dibujado") {
       this.dibujarLineaDesdeHistoria(pasoFinal.posicion_inicial, pasoFinal.entidad, "#05d305");
     }
+
+    this.store.commit("SELECCIONAR_LINEA", pasoFinal.linea);
   }
 
   dibujarLineaDesdeHistoria(puntoOrigen, puntoDestino, color) {
@@ -119,8 +127,8 @@ class Juego {
     //
     // el resto de los cuadros se registran por el mismo comportamiento
     // cuando finaliza la ejecución del comportamiento.
+    this.store.commit("SELECCIONAR_LINEA", 0);
     this.historia.registrarCambio(this.entidad);
-
   }
 
   detener() {
