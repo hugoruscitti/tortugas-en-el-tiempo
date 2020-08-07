@@ -1,5 +1,3 @@
-// https://docs.cypress.io/api/introduction/api.html
-
 describe('Acceso', () => {
   it('Puede abrir la aplicación', () => {
     cy.visit('/')

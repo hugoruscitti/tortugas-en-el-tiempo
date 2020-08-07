@@ -15,6 +15,9 @@ comandos:
 	@echo "    ${G}iniciar${N}                      Instala dependencias."
 	@echo "    ${G}ejecutar${N}                     Ejecuta la aplicación en modo desarrollo."
 	@echo ""
+	@echo "    ${G}test_e2e${N}                     Ejecuta test con cypress."
+	@echo "    ${G}test_unidad${N}                  Ejecuta test de unidad."
+	@echo ""
 
 iniciar:
 	$(call task, "Iniciando el proyecto.")
@@ -25,3 +28,8 @@ ejecutar:
 	$(call log, "Ejecutando la aplicación en modo desarrollo.")
 	@yarn serve
 
+test_e2e:
+	@yarn test:e2e
+
+test_unidad:
+	@yarn test:unit

@@ -68,8 +68,6 @@ export default {
       this.cuandoCambia(this.editor.getModel().getValue());
     });
 
-    window.editor = this.editor;
-
     this.ajustarTamañoDelEditor();
   },
 
