@@ -10,7 +10,10 @@
     <div class="flex" :class="{'o-50': desactivado}">
 
       <!-- contenedor para el editor Monaco -->
-      <div class="h5 w5 ba b--gray flex-grow-1 bg-white" ref="contenedor"></div>
+      <div
+        class="h5 w5 ba b--gray flex-grow-1 bg-white"
+        @dragover="cuandoIntentaSoltar($event)"
+        ref="contenedor"></div>
 
       <PanelDeFunciones :enEjecucion="desactivado" @cuandoQuiereAgregarCodigo="agregarCodigo"/>
 
@@ -25,6 +28,7 @@ import instanciaDeJuego from "@/juego.js";
 import BotonesDeEstado from "@/components/BotonesDeEstado.vue";
 import PanelDeFunciones from "@/components/PanelDeFunciones.vue";
 import * as monaco from 'monaco-editor';
+import crearIntérprete from "@/crear-interprete.js";
 
 
 export default {
@@ -67,6 +71,23 @@ export default {
     this.editor.onDidBlurEditorText(() => {
       this.cuandoCambia(this.editor.getModel().getValue());
     });
+
+    this.editor._domElement.addEventListener("dragover", (evento) => {
+      evento.preventDefault();
+      evento.stopPropagation();
+    });
+
+    this.editor._domElement.addEventListener("drop", (evento) => {
+      evento.preventDefault();
+      evento.stopPropagation();
+
+      let código = evento.dataTransfer.getData("text/plain");
+      let posición = this.editor.getTargetAtClientPoint(evento.clientX, evento.clientY).position;
+
+      this.agregarCodigo(código, posición);
+    });
+
+    window.editor = this.editor;
 
     this.ajustarTamañoDelEditor();
   },
@@ -111,40 +132,18 @@ export default {
       this.$store.commit("CAMBIAR_CÓDIGO", texto);
     },
 
-    crearInterprete(codigo) {
+    cuandoIntentaSoltar(evento) {
+      if (evento.target.className === "view-line") {
+        evento.target.classList.add("resaltar-linea");
 
-      function inicializar(_in, contexto) {
-
-        var avanzar = function(cantidad, cuandoTermina) {
-          return instanciaDeJuego.avanzar(cantidad, cuandoTermina);
-        };
-
-        var girarDerecha = function(grados, cuandoTermina) {
-          return instanciaDeJuego.girarDerecha(grados, cuandoTermina);
-        }
-
-        var girarIzquierda = function(grados, cuandoTermina) {
-          return instanciaDeJuego.girarIzquierda(grados, cuandoTermina);
-        }
-
-        var subirLapiz = function(cuandoTermina) {
-          return instanciaDeJuego.subirLapiz(cuandoTermina);
-        }
-
-        var bajarLapiz = function(cuandoTermina) {
-          return instanciaDeJuego.bajarLapiz(cuandoTermina);
-        }
-
-        _in.setProperty(contexto, 'avanzar', _in.createAsyncFunction(avanzar));
-        _in.setProperty(contexto, 'girarDerecha', _in.createAsyncFunction(girarDerecha));
-        _in.setProperty(contexto, 'girarIzquierda', _in.createAsyncFunction(girarIzquierda));
-        _in.setProperty(contexto, 'subirLapiz', _in.createAsyncFunction(subirLapiz));
-        _in.setProperty(contexto, 'bajarLapiz', _in.createAsyncFunction(bajarLapiz));
+        evento.target.parentElement.addEventListener("dragleave", () => {
+          evento.target.classList.remove("resaltar-linea");
+        });
       }
+    },
 
-      let interprete = new Interpreter(codigo, inicializar);
-
-      return interprete;
+    crearInterprete(codigo) {
+      return crearIntérprete(codigo, this.juego);
     },
 
     detener() {
@@ -254,8 +253,8 @@ export default {
     /**
      * Añade código en editor cuando se pulsa en un función del panel derecho.
      */
-    agregarCodigo(codigo) {
-      var position = this.editor.getPosition();
+    agregarCodigo(codigo, posición) {
+      posición = posición || this.editor.getPosition();
 
       var selection = this.editor.getSelection();
 
@@ -273,9 +272,9 @@ export default {
 
       this.editor.getModel().setValue(lista.join("\n"));
 
-      position.column = 1;
-      position.lineNumber += 1;
-      this.editor.setPosition(position);
+      posición.column = 1;
+      posición.lineNumber += 1;
+      this.editor.setPosition(posición);
       this.editor.focus();
     },
 

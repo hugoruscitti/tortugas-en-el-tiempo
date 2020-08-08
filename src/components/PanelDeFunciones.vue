@@ -7,6 +7,8 @@
     <div
       v-for="f in funciones" :key="f.codigo"
       class="truncate pointer pa2 hover-bg-black-10"
+      draggable=true
+      @dragstart="cuandoComienzaEventoArrastrar(f, $event)"
       @click="agregar(f.codigo)">{{f.titulo}}</div>
 
   </div>
@@ -41,6 +43,9 @@ export default {
   methods: {
     agregar(codigo) {
       this.$emit("cuandoQuiereAgregarCodigo", codigo);
+    },
+    cuandoComienzaEventoArrastrar(funcion, evento) {
+      evento.dataTransfer.setData('text/plain', funcion.codigo);
     }
   }
 }

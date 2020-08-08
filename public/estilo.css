@@ -118,3 +118,7 @@ input[type=range]:focus::-ms-fill-lower {
 input[type=range]:focus::-ms-fill-upper {
   background: #2497E3;
 }
+
+.resaltar-linea {
+  border-bottom: 2px solid #b0ccff;
+}
