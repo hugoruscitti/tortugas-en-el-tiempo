@@ -15,8 +15,8 @@ Para iniciar el servidor en modo desarrollo
 hay que ejecutar estos comandos:
 
 ```
-yarn install
-yarn serve
+make iniciar
+make ejecutar
 ```
 
 ## Cómo ejecutar test
@@ -25,6 +25,6 @@ Hay dos tipos de test en el proyecto, así que para ejecutarlos
 hay dos comandos diferentes:
 
 ```
-yarn test:unit
-yarn test:e2e
+make test_unidad
+make test_e2e
 ```
