@@ -6,6 +6,9 @@ Un entorno de programación experimental.
 
 https://hugoruscitti.github.io/tortugas-en-el-tiempo/
 
+
+![](imagenes/captura.png)
+
 ## Cómo iniciar el proyecto
 
 Para iniciar el servidor en modo desarrollo
